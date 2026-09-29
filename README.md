@@ -293,9 +293,8 @@ supply_chain_project/
 │   └── 05_model_training               ← Join, split, encode, train, MLflow logging
 │
 ├── model_predictions/
-│   └── 06_model_predictions            ← Load model + encoder, predict, evaluate
-│
-└── requirements.txt                   ← Python dependencies (to be added)
+    └── 06_model_predictions            ← Load model + encoder, predict, evaluate
+
 ```
 
 ### Notebook Execution Order
