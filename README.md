@@ -279,7 +279,7 @@ supply_chain_project/
 ├── README.md                          ← This file
 │
 ├── data_preparation/                  ← Medallion architecture + feature engineering
-│   ├── 00_data_preparation            ← Project setup, catalog/schema creation, config
+│   ├── 00_data_preparation            ← Runs other files 
 │   ├── bronze/
 │   │   └── 01_bronze_ingestion         ← Load raw CSV → Bronze Delta table
 │   ├── silver/
