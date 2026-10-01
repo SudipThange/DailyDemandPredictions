@@ -7,9 +7,3 @@ include:
 targets:
   dev:
     default: true
-    workspace:
-      host: ${var.databricks_host}
-
-variables:
-  databricks_host:
-    description: Databricks workspace URL
