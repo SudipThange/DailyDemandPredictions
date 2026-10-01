@@ -1,0 +1,64 @@
+project:
+  name: "DailyDemandPredictions"
+  environment: "dev"
+
+data_preparation:
+  catalog_name: "supply_chain_daily_demand"
+
+  bronze:
+    source:
+      schema_name: "raw"
+      volume_name: "data"
+      file_name: "supply_chain_dataset.csv"
+
+    target:
+      schema_name: "bronze"
+      table_name: "raw_daily_demand"
+
+  silver:
+    source:
+      bronze_schema_name: "bronze"
+      bronze_table_name: "raw_daily_demand"
+
+    target:
+      silver_schema_name: "silver"
+      silver_table_name: "transformed_daily_demand"
+
+  gold:
+    source:
+      silver_schema_name: "silver"
+      silver_table_name: "transformed_daily_demand"
+
+    target:
+      gold_schema_name: "gold"
+      aggregated_gold_table_name: "aggregated_daily_demand"
+      featured_gold_table_name: "features_daily_demand"
+    
+  feature_store:
+    source:
+      gold_schema_name: "gold"
+      featured_gold_table_name: "features_daily_demand"
+
+    target:
+      feature_schema: "features"
+      feature_table_name: "daily_demand_features"
+      label_table_name: "daily_demand_label"
+
+model_training:
+  catalog_name: "supply_chain_daily_demand"
+  
+  source:
+    feature_schema: "features"
+    feature_table_name: "daily_demand_features"
+    lable_schema: "gold"
+    label_table_name: "daily_demand_label"
+
+model_predictions:
+  catalog_name: "supply_chain_daily_demand"
+
+  source:
+    schema_name: "ml_model"
+    table_name: "testing_data"
+    model_path: "models:/supply_chain_daily_demand.ml_model.random_forest_demand/1"
+    output_table_name: "daily_demand_predictions"
+    
