@@ -1,7 +1,7 @@
 resources:
   jobs:
     new_daily_demand_ml_job:
-      name: new_daily_demand_ml_job
+      name: new_daily_demand_ml_job_dab
       tasks:
         - task_key: data_preparation
           spark_python_task:
