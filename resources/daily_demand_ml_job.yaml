@@ -1,0 +1,52 @@
+resources:
+  jobs:
+    new_daily_demand_ml_job:
+      name: new_daily_demand_ml_job
+      tasks:
+        - task_key: data_preparation
+          spark_python_task:
+            python_file: /Workspace/Users/sudipthange856@gmail.com/supply_chain_project/src/data_preparation/main_data_preparation.py
+          email_notifications:
+            on_start:
+              - sudipthange856@gmail.com
+            on_success:
+              - sudipthange856@gmail.com
+            on_failure:
+              - sudipthange856@gmail.com
+          environment_key: Default
+        - task_key: model_training
+          depends_on:
+            - task_key: data_preparation
+          spark_python_task:
+            python_file: /Workspace/Users/sudipthange856@gmail.com/supply_chain_project/src/model_training/main_model_training.py
+          email_notifications:
+            on_start:
+              - sudipthange856@gmail.com
+            on_success:
+              - sudipthange856@gmail.com
+            on_failure:
+              - sudipthange856@gmail.com
+          environment_key: Default
+        - task_key: model_predictions
+          depends_on:
+            - task_key: model_training
+          spark_python_task:
+            python_file: /Workspace/Users/sudipthange856@gmail.com/supply_chain_project/src/model_predictions/main_model_predictions.py
+          email_notifications:
+            on_start:
+              - sudipthange856@gmail.com
+            on_success:
+              - sudipthange856@gmail.com
+            on_failure:
+              - sudipthange856@gmail.com
+          environment_key: Default
+      queue:
+        enabled: true
+      environments:
+        - environment_key: Default
+          spec:
+            dependencies:
+              - -r
+                /Workspace/Users/sudipthange856@gmail.com/supply_chain_project/requirements.txt
+            environment_version: "6"
+      performance_target: PERFORMANCE_OPTIMIZED
