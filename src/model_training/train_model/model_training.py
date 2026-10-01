@@ -202,7 +202,7 @@ class ModelTraining:
             # mlflow.log_metrics({"testing_mae":mae,"testing_mse":mse,"testing_r2":r2})
 
             sign = infer_signature(X_test, predictions)
-            mlflow.sklearn.log_model(sk_model=model,name="random_forest_model",signature=sign)
+            mlflow.sklearn.log_model(sk_model=model,name="random_forest_model",skops_trusted_types=["sklearn.tree._tree.Tree"],signature=sign)
 
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.training_data", "data":training_data})
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.testing_data", "data":testing_data})
