@@ -20,11 +20,17 @@ class ModelPredictions:
 
         self.data = self.spark.read.table(table_path)
 
-    def get_run_id(self):
+    def get_champion_model(self):
         model_name = "supply_chain_daily_demand.ml_model.random_forest_demand"
-        model_version = self.client.get_model_version(name=model_name,version=1)
-        run_id = model_version.run_id
-        return run_id
+
+        champion = self.client.get_model_version_by_alias(name=model_name,alias="champion")
+
+        return champion
+
+    def get_run_id(self):
+        champion = self.get_champion_model()
+
+        return champion.run_id
     
     def encode_categories(self):
         self.load_data()

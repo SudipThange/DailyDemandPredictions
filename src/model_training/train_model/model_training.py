@@ -182,11 +182,12 @@ class ModelTraining:
 
             X_train, y_train, X_validation, y_validation, X_test, y_test = self.convert_into_sets(encoded_training_data, encoded_testing_data, encoded_validation_data)
 
-            model = RandomForestRegressor(n_estimators=100,random_state=42)
+            model = RandomForestRegressor(n_estimators=100,random_state=42,n_jobs=-1)
 
             mlflow.log_param("model_type", "RandomForestRegressor")
             mlflow.log_param("n_estimators", 100)
             mlflow.log_param("random_state", 42)
+            mlflow.log_param("n_jobs", -1)
 
             model.fit(X_train,y_train)
             mlflow.log_params({"model_type":"RandomForestRegressor","n_estimators":100,"random_state":42,"n_jobs":-1})
@@ -196,30 +197,95 @@ class ModelTraining:
             self.logging.info(f"Metrices Score on validatation data: mae={mae}, mse={mse}, r2={r2}")
             mlflow.log_metrics({"validation_mae":mae,"validation_mse":mse,"validation_r2":r2})
 
-            # predictions = model.predict(X_test)
-            # mae, mse, r2 = self.validate_model(y_test, predictions)
-            # logging.info(f"Metrices Score on testing data:", mae, mse, r2)
-            # mlflow.log_metrics({"testing_mae":mae,"testing_mse":mse,"testing_r2":r2})
-
-            sign = infer_signature(X_test, predictions)
+            sign = infer_signature(X_validation, predictions)
             mlflow.sklearn.log_model(sk_model=model,name="random_forest_model",skops_trusted_types=["sklearn.tree._tree.Tree"],signature=sign)
 
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.training_data", "data":training_data})
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.testing_data", "data":testing_data})
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.validation_data", "data":validation_data})
 
-            return (X_test, predictions)
+           self.register_model(run_id=mlflow.active_run().info.run_id,validation_r2=r2,validation_mae=mae,validation_mse=mse)
 
-    def register_model(self):
+    def register_model(self,run_id,validation_r2,validation_mae,validation_mse):
         client = MlflowClient()
 
-        experiment = mlflow.get_experiment_by_name("/Users/sudipthange856@gmail.com/supply_chain_demand")
+        MODEL_NAME = "supply_chain_daily_demand.ml_model.random_forest_demand"
 
-        best_run = client.search_runs(experiment_ids=[experiment.experiment_id],order_by=["metrics.validation_mae DESC"],max_results=1)
-        run_id = best_run[0].info.run_id
-        model_uri = f"runs:/{run_id}/random_forest_model"
+        # 1. Minimum quality threshold
+        MIN_R2 = 0.90
 
-        mlflow.register_model(model_uri=model_uri,name="supply_chain_daily_demand.ml_model.random_forest_demand")
+        if validation_r2 < MIN_R2:
+            logging.info(f"Model rejected. Validation R2={validation_r2:.4f} is below threshold={MIN_R2}")
 
-        client.set_registered_model_alias(name="supply_chain_daily_demand.ml_model.random_forest_demand",alias="dev",version="1")
+            mlflow.set_tag("model_status", "rejected")
 
+        logging.info(f"Model passed quality gate. Validation R2={validation_r2:.4f}")
+
+        # 2. Register candidate model
+        model_uri = (f"runs:/{run_id}/random_forest_model")
+
+        registered_model = mlflow.register_model(model_uri=model_uri,name=MODEL_NAME)
+
+        candidate_version = registered_model.version
+
+        logging.info(f"Candidate model registered. Version={candidate_version}")
+
+        # 3. Check current Champion
+        try:
+            champion = client.get_model_version_by_alias(MODEL_NAME,"champion")
+
+            champion_version = champion.version
+            champion_run_id = champion.run_id
+
+            logging.info(f"Current Champion found. Version={champion_version}")
+        except Exception:
+            champion = None
+
+            logging.info("No Champion model exists.")
+
+        if champion is None:
+
+            client.set_registered_model_alias(name=MODEL_NAME,alias="champion",version=candidate_version)
+
+            logging.info(f"Candidate version {candidate_version} | promoted to Champion.")
+
+            return {"status": "CHAMPION","version": candidate_version,"run_id": run_id}
+
+        # 5. Get Champion metrics
+        champion_run = client.get_run(champion_run_id)
+
+        champion_r2 = champion_run.data.metrics.get("validation_r2")
+
+        champion_mae = champion_run.data.metrics.get("validation_mae")
+
+        logging.info(f"Champion metrics: R2={champion_r2:.4f}, MAE={champion_mae:.4f}")
+
+        # 6. Compare Candidate vs Champion
+        candidate_is_better = (
+            validation_r2 >= MIN_R2
+            and validation_mae < champion_mae
+        )
+
+        # 7. Promote Candidate
+        if candidate_is_better:
+
+            # Old Champion becomes Challenger
+            client.set_registered_model_alias(name=MODEL_NAME,alias="challenger",version=champion_version)
+
+            # Candidate becomes Champion
+            client.set_registered_model_alias(name=MODEL_NAME,alias="champion",version=candidate_version)
+
+            logging.info(f"Candidate version {candidate_version} is better than Champion version {champion_version}.")
+
+            logging.info(f"Version {candidate_version} promoted to Champion.")
+
+        # 8. Candidate remains Challenger
+        else:
+
+            client.set_registered_model_alias(
+                name=MODEL_NAME,
+                alias="challenger",
+                version=candidate_version
+            )
+
+            logging.info(f"Candidate version {candidate_version} did not outperform Champion.")

@@ -59,6 +59,6 @@ model_predictions:
   source:
     schema_name: "ml_model"
     table_name: "testing_data"
-    model_path: "models:/supply_chain_daily_demand.ml_model.random_forest_demand/1"
+    model_path: "models:/supply_chain_daily_demand.ml_model.random_forest_demand@champion""
     output_table_name: "daily_demand_predictions"
     
