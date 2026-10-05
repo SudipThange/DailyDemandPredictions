@@ -204,7 +204,7 @@ class ModelTraining:
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.testing_data", "data":testing_data})
             self.save_to_table({"table_path":"supply_chain_daily_demand.ml_model.validation_data", "data":validation_data})
 
-           self.register_model(run_id=mlflow.active_run().info.run_id,validation_r2=r2,validation_mae=mae,validation_mse=mse)
+            self.register_model(run_id=mlflow.active_run().info.run_id,validation_r2=r2,validation_mae=mae,validation_mse=mse)
 
     def register_model(self,run_id,validation_r2,validation_mae,validation_mse):
         client = MlflowClient()
