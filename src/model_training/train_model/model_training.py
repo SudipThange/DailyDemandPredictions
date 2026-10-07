@@ -182,15 +182,10 @@ class ModelTraining:
 
             X_train, y_train, X_validation, y_validation, X_test, y_test = self.convert_into_sets(encoded_training_data, encoded_testing_data, encoded_validation_data)
 
-            model = RandomForestRegressor(n_estimators=100,random_state=42,n_jobs=-1)
-
-            mlflow.log_param("model_type", "RandomForestRegressor")
-            mlflow.log_param("n_estimators", 100)
-            mlflow.log_param("random_state", 42)
-            mlflow.log_param("n_jobs", -1)
+            model = RandomForestRegressor(n_estimators=100,random_state=42,n_jobs=-1, max_depth=15,min_samples_split=5,min_samples_leaf=2)
 
             model.fit(X_train,y_train)
-            mlflow.log_params({"model_type":"RandomForestRegressor","n_estimators":100,"random_state":42,"n_jobs":-1})
+            mlflow.log_params({"model_type":"RandomForestRegressor","n_estimators":100,"random_state":42,"n_jobs":-1,"max_depth":15,"min_samples_split":5,"min_samples_leaf":2})
 
             predictions = model.predict(X_validation)
             mae, mse, r2 = self.validate_model(y_validation, predictions)
