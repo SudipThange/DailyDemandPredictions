@@ -3,9 +3,14 @@ resources:
     new_daily_demand_ml_job:
       name: new_daily_demand_ml_job_dab
 
+      schedule:
+        quartz_cron_expression: "0 0 0 * * ?"
+        timezone_id: "Asia/Kolkata"
+        pause_status: "UNPAUSED"
+
       tags:
         project: daily_demand_prediction
-        environment: dev
+        environment: ${bundle.target}
         team: data_science
         managed_by: databricks_dab
         pipeline: ml_pipeline
