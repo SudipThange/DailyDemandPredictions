@@ -17,7 +17,7 @@ class Silver:
 
         self.logging.info(f"Loading the delta table from path: {bronze_table_path}.")
         self.data = self.spark.read.table(bronze_table_path)
-        self.logging.info(f"Bronze delta table is loaded.")
+        self.logging.info("Bronze delta table is loaded.")
 
     def remove_duplicates(self):
         window_config = Window.partitionBy("transaction_id").orderBy("transaction_date")

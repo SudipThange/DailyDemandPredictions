@@ -19,7 +19,7 @@ class FeatureStore:
 
         self.logging.info(f"Loading the feature table from the {gold_table_path}")
         self.data = self.spark.read.table(gold_table_path)
-        self.logging.info(f"Gold feature table loaded in the dataframe.")
+        self.logging.info("Gold feature table loaded in the dataframe.")
 
     def add_primary_key(self):
         self.logging.info("Adding primary key: feature_uid")
@@ -47,7 +47,6 @@ class FeatureStore:
 
     def save_label_data(self):
         label_table_path = f"{self.catalog_name}.{self.gold_schema_name}.{self.label_table_name}"
-        gold_table_path = f"{self.catalog_name}.{self.gold_schema_name}.{self.featured_gold_table_name}"
 
         self.logging.info("Selected the req columns for the label data table")
         label_data = self.data.select(["feature_uid", "total_demand"])

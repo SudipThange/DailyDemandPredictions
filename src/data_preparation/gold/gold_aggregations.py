@@ -1,7 +1,3 @@
-import pyspark.sql.functions as F
-from pyspark.sql.window import Window
-
-
 class Gold:
     def __init__(self, catalog_name, silver_schema_name, silver_table_name,gold_schema_name, aggregated_gold_table_name, featured_gold_table_name,spark, logging):
         self.catalog_name = catalog_name

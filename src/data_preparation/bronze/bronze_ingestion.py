@@ -23,7 +23,7 @@ class Bronze:
                               .option("inferSchema", "true")\
                               .load(file_path)
 
-        self.logging.info(f"File loaded and saved in the dataframe.")
+        self.logging.info("File loaded and saved in the dataframe.")
         #self.data.show()
 
     def write_to_bronze(self):

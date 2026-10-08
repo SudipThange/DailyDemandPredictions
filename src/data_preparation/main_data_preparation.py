@@ -30,7 +30,7 @@ def run_bronze(config, spark, logging):
     bronze_schema_name = config["data_preparation"]["bronze"]["target"]["schema_name"]
     bronze_table_name = config["data_preparation"]["bronze"]["target"]["table_name"]
 
-    bronze_obj = Bronze(spark=spark, logging=logging, catalog_name="supply_chain_daily_demand", bronze_schema_name="bronze", raw_schema_name="raw", volume_name="data", bronze_table_name="raw_daily_demand",file_name="supply_chain_dataset.csv")
+    bronze_obj = Bronze(spark=spark, logging=logging, catalog_name=catalog_name, bronze_schema_name=bronze_schema_name, raw_schema_name=raw_schema_name, volume_name=volume_name, bronze_table_name=bronze_table_name, file_name=file_name)
 
     bronze_obj.load_raw_data()
     bronze_obj.write_to_bronze()
