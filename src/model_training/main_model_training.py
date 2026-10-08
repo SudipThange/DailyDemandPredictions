@@ -2,6 +2,7 @@ import logging
 
 import yaml
 from pyspark.sql import SparkSession
+
 from model_training.train_model.model_training import ModelTraining
 
 # logging configurations

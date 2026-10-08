@@ -1,8 +1,9 @@
 import logging
 
 import yaml
-from model_predictions\model_predict.model_predict.model_predictions import ModelPredictions
 from pyspark.sql import SparkSession
+
+from model_predictions.model_predict.model_predictions import ModelPredictions
 
 # logging configurations
 logging.basicConfig(
