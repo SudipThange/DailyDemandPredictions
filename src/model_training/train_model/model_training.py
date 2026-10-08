@@ -210,11 +210,11 @@ class ModelTraining:
         MIN_R2 = 0.90
 
         if validation_r2 < MIN_R2:
-            logging.info(f"Model rejected. Validation R2={validation_r2:.4f} is below threshold={MIN_R2}")
+            self.logging.info(f"Model rejected. Validation R2={validation_r2:.4f} is below threshold={MIN_R2}")
 
             mlflow.set_tag("model_status", "rejected")
 
-        logging.info(f"Model passed quality gate. Validation R2={validation_r2:.4f}")
+        self.logging.info(f"Model passed quality gate. Validation R2={validation_r2:.4f}")
 
         # 2. Register candidate model
         model_uri = (f"runs:/{run_id}/random_forest_model")
@@ -223,7 +223,7 @@ class ModelTraining:
 
         candidate_version = registered_model.version
 
-        logging.info(f"Candidate model registered. Version={candidate_version}")
+        self.logging.info(f"Candidate model registered. Version={candidate_version}")
 
         # 3. Check current Champion
         try:
@@ -232,17 +232,17 @@ class ModelTraining:
             champion_version = champion.version
             champion_run_id = champion.run_id
 
-            logging.info(f"Current Champion found. Version={champion_version}")
+            self.logging.info(f"Current Champion found. Version={champion_version}")
         except Exception:
             champion = None
 
-            logging.info("No Champion model exists.")
+            self.logging.info("No Champion model exists.")
 
         if champion is None:
 
             client.set_registered_model_alias(name=MODEL_NAME,alias="champion",version=candidate_version)
 
-            logging.info(f"Candidate version {candidate_version} | promoted to Champion.")
+            self.logging.info(f"Candidate version {candidate_version} | promoted to Champion.")
 
             return {"status": "CHAMPION","version": candidate_version,"run_id": run_id}
 
@@ -253,7 +253,7 @@ class ModelTraining:
 
         champion_mae = champion_run.data.metrics.get("validation_mae")
 
-        logging.info(f"Champion metrics: R2={champion_r2:.4f}, MAE={champion_mae:.4f}")
+        self.logging.info(f"Champion metrics: R2={champion_r2:.4f}, MAE={champion_mae:.4f}")
 
         # 6. Compare Candidate vs Champion
         candidate_is_better = (
@@ -270,9 +270,9 @@ class ModelTraining:
             # Candidate becomes Champion
             client.set_registered_model_alias(name=MODEL_NAME,alias="champion",version=candidate_version)
 
-            logging.info(f"Candidate version {candidate_version} is better than Champion version {champion_version}.")
+            self.logging.info(f"Candidate version {candidate_version} is better than Champion version {champion_version}.")
 
-            logging.info(f"Version {candidate_version} promoted to Champion.")
+            self.logging.info(f"Version {candidate_version} promoted to Champion.")
 
         # 8. Candidate remains Challenger
         else:
@@ -283,4 +283,4 @@ class ModelTraining:
                 version=candidate_version
             )
 
-            logging.info(f"Candidate version {candidate_version} did not outperform Champion.")
+            self.logging.info(f"Candidate version {candidate_version} did not outperform Champion.")
