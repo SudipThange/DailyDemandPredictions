@@ -1,11 +1,11 @@
 import logging
 
 import yaml
-from bronze.bronze_ingestion import Bronze
-from feature_store.feature_store import FeatureStore
-from gold.gold_aggregations import Gold
+from data_preparation.bronze.bronze_ingestion import Bronze
+from data_preparation.feature_store.feature_store import FeatureStore
+from data_preparation.gold.gold_aggregations import Gold
 from pyspark.sql import SparkSession
-from silver.silver_transformation import Silver
+from data_preparation.silver.silver_transformation import Silver
 
 # logging configurations
 logging.basicConfig(
