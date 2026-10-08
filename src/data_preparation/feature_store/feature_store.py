@@ -1,6 +1,7 @@
 import pyspark.sql.functions as F
 from databricks.feature_engineering import FeatureEngineeringClient
 
+
 class FeatureStore:
     def __init__(self, spark, logging, catalog_name, gold_schema_name, featured_gold_table_name, feature_schema, feature_table_name, label_table_name):
         self.spark = spark

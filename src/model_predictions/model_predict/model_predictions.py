@@ -1,8 +1,9 @@
-import mlflow
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
-from mlflow import MlflowClient
 import joblib
+import mlflow
 import pandas as pd
+from mlflow import MlflowClient
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
 
 class ModelPredictions:
     def __init__(self, spark, logging, catalog_name, schema_name, table_name, model_path, output_table_name):

@@ -1,7 +1,8 @@
-import yaml
-from pyspark.sql import SparkSession
 import logging
+
+import yaml
 from model_predict.model_predictions import ModelPredictions
+from pyspark.sql import SparkSession
 
 # logging configurations
 logging.basicConfig(
@@ -33,7 +34,7 @@ if __name__  == "__main__":
     spark = SparkSession.builder.getOrCreate()
     config = load_config(r"/Workspace/Users/sudipthange856@gmail.com/supply_chain_project/config/config.yml")
 
-    logging.info("Model prediction started. 🔃")
+    logger.info("Model prediction started. 🔃")
     run_model_predictions(config, spark, logger)
-    logging.info("Model predictions completed. ✅")
+    logger.info("Model predictions completed. ✅")
 

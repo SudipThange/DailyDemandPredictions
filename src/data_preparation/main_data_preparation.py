@@ -1,10 +1,11 @@
-import yaml
-from pyspark.sql import SparkSession
-from bronze.bronze_ingestion import Bronze
-from silver.silver_transformation import Silver
-from gold.gold_aggregations import Gold
-from feature_store.feature_store import FeatureStore
 import logging
+
+import yaml
+from bronze.bronze_ingestion import Bronze
+from feature_store.feature_store import FeatureStore
+from gold.gold_aggregations import Gold
+from pyspark.sql import SparkSession
+from silver.silver_transformation import Silver
 
 # logging configurations
 logging.basicConfig(
@@ -82,20 +83,21 @@ if __name__  == "__main__":
     config = load_config(r"/Workspace/Users/sudipthange856@gmail.com/supply_chain_project/config/config.yml")
     #print(config["data_preparation"]["bronze"])
 
-    logging.info("Bronze - raw data ingestion started. 🔃")
+    logger.info("Bronze - raw data ingestion started. 🔃")
     run_bronze(config, spark, logger)
-    logging.info("Bronze layer completed. ✅")
+    logger.info("Bronze layer completed. ✅")
 
-    logging.info("Silver - transformation started on the bronze raw data. 🔃")
+    logger.info("Silver - transformation started on the bronze raw data. 🔃")
     run_silver(config, spark, logger)
-    logging.info("Silver layer completed. ✅")
+    logger.info("Silver layer completed. ✅")
 
-    logging.info("Gold - aggregations & features engineering started on the transformed data. 🔃")
+    logger.info("Gold - aggregations & features engineering started on the transformed data. 🔃")
     run_gold(config, spark, logger)
-    logging.info("Gold layer completed. ✅")
+    logger.info("Gold layer completed. ✅")
 
-    logging.info("Feature Store - started registering the feature data in the feature store. 🔃")
+    logger.info("Feature Store - started registering the feature data in the feature store. 🔃")
     run_feature_store(config, spark, logger)
-    logging.info("Feature Store layer completed. ✅")
+    logger.info("Feature Store layer completed. ✅")
+
 
    

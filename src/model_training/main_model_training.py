@@ -1,6 +1,7 @@
+import logging
+
 import yaml
 from pyspark.sql import SparkSession
-import logging
 from train_model.model_training import ModelTraining
 
 # logging configurations
@@ -36,7 +37,7 @@ if __name__  == "__main__":
     spark = SparkSession.builder.getOrCreate()
     config = load_config(r"/Workspace/Users/sudipthange856@gmail.com/supply_chain_project/config/config.yml")
 
-    logging.info("Model training & registering started. 🔃")
+    logger.info("Model training & registering started. 🔃")
     run_model_training(config, spark, logger)
-    logging.info("Model training & registration completed. ✅")
+    logger.info("Model training & registration completed. ✅")
 

@@ -1,5 +1,6 @@
 import pyspark.sql.functions as F
 
+
 # bronze class
 class Bronze:
     def __init__(self, spark, logging, catalog_name, bronze_schema_name, raw_schema_name, volume_name, bronze_table_name, file_name):

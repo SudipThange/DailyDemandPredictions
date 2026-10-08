@@ -1,5 +1,6 @@
 import pyspark.sql.functions as F
-from pyspark.sql.window import Window 
+from pyspark.sql.window import Window
+
 
 class Silver:
     def __init__(self, spark, logging, catalog_name, bronze_schema_name, bronze_table_name, silver_schema_name, silver_table_name):

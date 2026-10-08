@@ -1,16 +1,17 @@
-import mlflow
 import joblib
+import mlflow
 import mlflow.sklearn
+import pandas as pd
+import pyspark.sql.functions as F
+from databricks.feature_engineering import FeatureEngineeringClient
+from databricks.feature_store import FeatureLookup
 from mlflow.client import MlflowClient
 from mlflow.models import infer_signature
-import pyspark.sql.functions as F
-from sklearn.preprocessing import OneHotEncoder
-from databricks.feature_engineering import FeatureEngineeringClient
 from pyspark.sql.window import Window
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
-from databricks.feature_store import FeatureLookup
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.preprocessing import OneHotEncoder
+
 
 # encoding class
 class LabelEncoding:
@@ -180,7 +181,7 @@ class ModelTraining:
             joblib.dump(fitted_encoder, "/tmp/encoder.pkl")
             mlflow.log_artifact("/tmp/encoder.pkl", artifact_path="encoder")
 
-            X_train, y_train, X_validation, y_validation, X_test, y_test = self.convert_into_sets(encoded_training_data, encoded_testing_data, encoded_validation_data)
+            X_train, y_train, X_validation, y_validation, _X_test, _y_test = self.convert_into_sets(encoded_training_data, encoded_testing_data, encoded_validation_data)
 
             model = RandomForestRegressor(n_estimators=100,random_state=42,n_jobs=-1, max_depth=15,min_samples_split=5,min_samples_leaf=2)
 
@@ -227,15 +228,17 @@ class ModelTraining:
 
         # 3. Check current Champion
         try:
-            champion = client.get_model_version_by_alias(MODEL_NAME,"champion")
+            champion = client.get_model_version_by_alias(
+                MODEL_NAME,
+                "champion"
+            )
 
             champion_version = champion.version
             champion_run_id = champion.run_id
 
             self.logging.info(f"Current Champion found. Version={champion_version}")
-        except Exception:
+        except mlflow.exceptions.MlflowException:
             champion = None
-
             self.logging.info("No Champion model exists.")
 
         if champion is None:
