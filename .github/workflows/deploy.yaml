@@ -28,14 +28,14 @@ jobs:
 
       - name: Configure Python path
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
-        
+
       - name: Run linting
         run: |
           ruff check .
 
       - name: Run unit tests
         run: |
-          python -m pytest tests/data_preparation/test_bronze.py -v
+          python -m pytest tests/ -v
 
   deploy:
     name: Deploy to Databricks
