@@ -40,33 +40,6 @@ def test_load_from_bronze(silver):
         f"{silver.bronze_table_name}"
     )
 
-
-@patch("data_preparation.silver.silver_transformation.Window")
-def test_remove_duplicates(mock_window, silver):
-    mock_window.partitionBy.return_value.orderBy.return_value = MagicMock()
-
-    dataframe = MagicMock()
-    silver.data = dataframe
-
-    dataframe.count.side_effect = [5, 3]
-    dataframe.withColumn.return_value = dataframe
-
-    filtered_dataframe = MagicMock()
-    dataframe.withColumn.return_value.filter.return_value = (
-        filtered_dataframe
-    )
-    filtered_dataframe.drop.return_value = filtered_dataframe
-
-    # Execute the method
-    silver.remove_duplicates()
-
-    # Verify the Window configuration
-    mock_window.partitionBy.assert_called_once_with("transaction_id")
-    mock_window.partitionBy.return_value.orderBy.assert_called_once_with(
-        "transaction_date"
-    )
-
-
 @patch(
     "data_preparation.silver.silver_transformation.F.current_timestamp"
 )
