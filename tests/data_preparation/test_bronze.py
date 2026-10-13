@@ -2,8 +2,8 @@
 import logging
 from unittest.mock import MagicMock, patch
 
-import yaml
 import pytest
+import yaml
 
 from data_preparation.bronze.bronze_ingestion import Bronze
 
