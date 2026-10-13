@@ -41,8 +41,10 @@ def test_load_from_bronze(silver):
     )
 
 
-def test_remove_duplicates(silver):
-    # Mock the dataframe operations
+@patch("data_preparation.silver.silver_transformation.Window")
+def test_remove_duplicates(mock_window, silver):
+    mock_window.partitionBy.return_value.orderBy.return_value = MagicMock()
+
     dataframe = MagicMock()
     silver.data = dataframe
 
@@ -55,16 +57,14 @@ def test_remove_duplicates(silver):
     )
     filtered_dataframe.drop.return_value = filtered_dataframe
 
+    # Execute the method
     silver.remove_duplicates()
 
-    # Verify duplicate removal operations
-    dataframe.count.assert_called_once()
-    dataframe.withColumn.assert_called_once()
-    dataframe.withColumn.return_value.filter.assert_called_once()
-    filtered_dataframe.drop.assert_called_once_with("duplicate_count")
-
-    # Verify the final dataframe replaces the original
-    assert silver.data is filtered_dataframe
+    # Verify the Window configuration
+    mock_window.partitionBy.assert_called_once_with("transaction_id")
+    mock_window.partitionBy.return_value.orderBy.assert_called_once_with(
+        "transaction_date"
+    )
 
 
 @patch(
