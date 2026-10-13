@@ -1,7 +1,35 @@
 
+import logging
 from unittest.mock import MagicMock, patch
 
+import yaml
+import pytest
+
 from data_preparation.bronze.bronze_ingestion import Bronze
+
+
+@pytest.fixture
+def config():
+    with open("config/config.yml", "r", encoding="utf-8") as file:
+        return yaml.safe_load(file)
+
+
+@pytest.fixture
+def bronze(config):
+    settings = config["data_preparation"]
+    source = settings["bronze"]["source"]
+    target = settings["bronze"]["target"]
+
+    return Bronze(
+        spark=MagicMock(),
+        logging=logging.getLogger("test_bronze"),
+        catalog_name=settings["catalog_name"],
+        bronze_schema_name=target["schema_name"],
+        raw_schema_name=source["schema_name"],
+        volume_name=source["volume_name"],
+        bronze_table_name=target["table_name"],
+        file_name=source["file_name"],
+    )
 
 
 def test_load_raw_data(bronze):
@@ -11,7 +39,7 @@ def test_load_raw_data(bronze):
 
     bronze.spark.read.format.assert_called_once_with("csv")
 
-    # Each chained option() call returns a new mock
+    # Verify the chained CSV reader options
     reader.option.assert_called_once_with("header", "true")
 
     option_1 = reader.option.return_value
@@ -37,6 +65,7 @@ def test_load_raw_data(bronze):
 )
 def test_write_to_bronze(mock_current_timestamp, bronze):
     dataframe = MagicMock()
+
     dataframe.drop.return_value = dataframe
     dataframe.withColumn.return_value = dataframe
 
@@ -51,8 +80,9 @@ def test_write_to_bronze(mock_current_timestamp, bronze):
         "operation_type",
     )
 
-    # Verify timestamp creation without a real Spark context
+    # Verify the ingestion timestamp is added
     mock_current_timestamp.assert_called_once_with()
+
     dataframe.withColumn.assert_called_once_with(
         "bronze_ingestion_timestamp",
         mock_current_timestamp.return_value,
