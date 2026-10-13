@@ -1,5 +1,5 @@
-import pytest
 from unittest.mock import MagicMock
+import pytest
 
 CATALOG = "supply_chain_daily_demand"
 GOLD_SCHEMA = "gold"
