@@ -1,3 +1,4 @@
+
 name: Deploy Daily Demand Predictions
 
 on:
@@ -7,7 +8,7 @@ on:
 
 jobs:
   ci:
-    name: Lint and Type Check
+    name: Lint and Unit Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -23,12 +24,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff
+          pip install ruff pytest pyyaml
 
       - name: Run linting
         run: |
           ruff check .
 
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/data_preparation/test_bronze.py -v
 
   deploy:
     name: Deploy to Databricks
@@ -37,7 +41,6 @@ jobs:
     needs: ci
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
