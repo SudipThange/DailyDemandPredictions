@@ -32,12 +32,16 @@ def bronze(config):
     )
 
 
+
 def test_load_raw_data(bronze):
     bronze.load_raw_data()
 
-    reader = bronze.spark.read.format.return_value
+    spark_read = bronze.spark.read
+    reader = spark_read.format.return_value
 
-    bronze.spark.read.format.assert_called_once_with("csv")
+    spark_read.format.assert_called_once_with("csv")
+
+    assert reader.option.call_count == 3
 
     reader.option.assert_any_call("header", "true")
     reader.option.assert_any_call("sep", ",")
@@ -51,6 +55,7 @@ def test_load_raw_data(bronze):
     )
 
     reader.load.assert_called_once_with(expected_path)
+
 
 
 def test_write_to_bronze(bronze):
